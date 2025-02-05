@@ -18,4 +18,12 @@ class OrderService(private val orderRepository: OrderRepository) {
     fun deleteOrderByID(id: Long) = orderRepository.deleteById(id)
 
     fun countOrders() = orderRepository.count()
+
+    fun updateOrder(id: Long, orderDTO: OrderDTO) = orderRepository.findById(id).map {
+        orderRepository.save(orderDTO.toOrderEntity()).toOrderDTO()
+    }.orElse(null)
+
+    fun findByProductName(name: String) = orderRepository.findByProductNameContainingIgnoreCase(name).map {
+        it.toOrderDTO()
+    }
 }

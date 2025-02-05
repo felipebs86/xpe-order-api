@@ -36,4 +36,20 @@ class OrderController(private val orderService: OrderService) {
     fun countOrders(): Long {
         return orderService.countOrders()
     }
+
+    @PutMapping("/{id}")
+    fun updateOrder(
+        @PathVariable id: Long,
+        @RequestBody orderDTO: OrderDTO
+    ): ResponseEntity<OrderDTO> {
+        val updatedOrder = orderService.updateOrder(id, orderDTO)
+        return updatedOrder?.let { ResponseEntity.ok(it) } ?: ResponseEntity.notFound().build()
+    }
+
+    @GetMapping("/search")
+    fun searchOrdersByName(@RequestParam name: String): ResponseEntity<List<OrderDTO>> {
+        val orders = orderService.findByProductName(name)
+        return if (orders.isNotEmpty()) ResponseEntity.ok(orders) else ResponseEntity.notFound().build()
+    }
+
 }
