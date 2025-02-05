@@ -19,9 +19,22 @@ class OrderService(private val orderRepository: OrderRepository) {
 
     fun countOrders() = orderRepository.count()
 
-    fun updateOrder(id: Long, orderDTO: OrderDTO) = orderRepository.findById(id).map {
-        orderRepository.save(orderDTO.toOrderEntity()).toOrderDTO()
-    }.orElse(null)
+    fun updateOrder(id: Long, orderDTO: OrderDTO): OrderDTO? {
+        val existingOrder = orderRepository.findById(id)
+
+        return if (existingOrder.isPresent) {
+            val updatedOrder = existingOrder.get().copy(
+                productName = orderDTO.productName,
+                quantity = orderDTO.quantity,
+                totalPrice = orderDTO.totalPrice
+            )
+            orderRepository.save(updatedOrder)
+            updatedOrder.toOrderDTO()
+        } else {
+            null
+        }
+    }
+
 
     fun findByProductName(name: String) = orderRepository.findByProductNameContainingIgnoreCase(name).map {
         it.toOrderDTO()
